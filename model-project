@@ -1,0 +1,95 @@
+from keras.models import Model
+from keras.layers import Dense, GlobalAveragePooling2D, Flatten, Dropout, Input, Conv2D, MaxPooling2D, BatchNormalization
+from keras.preprocessing.image import ImageDataGenerator
+from keras.callbacks import ModelCheckpoint
+from keras.callbacks import CSVLogger
+
+import numpy as np 
+import matplotlib as mp
+#matplotlib inline
+import matplotlib.pyplot as plt
+import tensorflow as tf
+import tensorflow.contrib.slim as slim
+from tensorflow.examples.tutorials.mnist import input_data
+import os.path
+
+img_width, img_height =128, 128
+
+train_data_dir = 'train' #contains seven classes
+validation_data_dir = 'validation' #contains seven classes
+
+nb_train_samples = 400 #80%
+nb_validation_samples = 100  #20%
+nb_epoch = 100
+batch_size = 32
+
+############################## Our Model #########################################
+img_input = Input(shape=(img_width,img_height,3),name='input')
+
+x = Conv2D(32, (3,3), activation='relu', padding='same', name='conv1')(img_input)
+x = MaxPooling2D((2, 2), strides=(2, 2), name='pool1')(x)
+
+x = Conv2D(32, (3,3), activation='relu', padding='same', name='conv2')(x)
+x = MaxPooling2D((2, 2), strides=(2, 2), name='pool2')(x)
+
+x = Conv2D(32, (3,3), activation='relu', padding='same', name='conv3')(x)
+x = MaxPooling2D((2, 2), strides=(2, 2), name='pool3')(x)
+
+x = Conv2D(32, (3,3), activation='relu', padding='same', name='conv4')(x)
+x = MaxPooling2D((2, 2), strides=(2, 2), name='pool4')(x)
+
+x = Conv2D(64, (3,3), activation='relu', padding='same', name='conv5')(x)
+x = MaxPooling2D((2, 2), strides=(2, 2), name='pool5')(x)
+
+x = Conv2D(128, (3,3), activation='relu', padding='same', name='conv6')(x)
+x = MaxPooling2D((2, 2), strides=(2, 2), name='pool6')(x)
+
+##################################################################################
+
+x = Flatten()(x)
+x = Dense(2048)(x)
+x = Dense(2048)(x)
+
+predictions = Dense(5, activation='softmax', name='predictions')(x)
+model = Model(inputs=img_input, outputs=predictions)
+
+model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+train_datagen = ImageDataGenerator(rescale=1./255, featurewise_std_normalization=True, featurewise_center=True)
+
+valid_datagen = ImageDataGenerator(rescale=1./255, featurewise_std_normalization=True, featurewise_center=True)
+
+train_generator = train_datagen.flow_from_directory(
+    train_data_dir,
+    target_size=(img_width, img_height),
+    batch_size=batch_size,
+    class_mode='categorical'
+    )
+
+validation_generator = valid_datagen.flow_from_directory(
+    validation_data_dir,
+    target_size=(img_width, img_height),
+    batch_size=batch_size,
+    class_mode='categorical'
+)
+#  --------------------callbacks---------------------------
+filepathlast= "weights.last.hdf5"
+checkpoint1 = ModelCheckpoint(filepathlast, monitor='val_acc', verbose=1, save_best_only=False)
+filepathbest= "weights.best-{epoch:03d}-{val_acc:.3f}.hdf5"
+
+checkpoint2 = ModelCheckpoint(filepathbest, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+csv_logger = CSVLogger('log.csv', append=True, separator=';')
+callbacks_list=[checkpoint1,checkpoint2,csv_logger,tensorboard]
+
+#  load weights if exists
+filepath="weights.last.hdf5"
+if os.path.exists(filepath):
+    model.load_weights("weights.last.hdf5")
+
+#  ------------------
+print("Starting to fit the model")
+model.fit_generator(train_generator,
+                    steps_per_epoch=nb_train_samples/batch_size,
+                    validation_steps=nb_validation_samples/batch_size,
+                    epochs=nb_epoch,validation_data=validation_generator, verbose=1,
+                    callbacks=callbacks_list)
