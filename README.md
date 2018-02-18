@@ -1,2 +1,2 @@
-# RT-Q-CNN
-Road Type and Quality CNN Project
+CNN-ENOSE
+Chemical volatiles detection
