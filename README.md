@@ -1,4 +1,8 @@
 This project provides 1D Convolutional neural network (CNN) application for the recognition of chemical volatiles.
+
+
+
+
 We use three datasets obtained with e-nose detection systems in realistic environments.
 
 The first data set is UMA. In this data set, there are 69 samples belonging to seven different substances. For full dataset please visit: http://mapir.uma.es/mapirwebsite/index.php/people/109-javier-gonzalez-monroy
