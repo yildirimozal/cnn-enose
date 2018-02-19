@@ -11,3 +11,10 @@ Four different classes were considered for this dataset. Commercial alcohols (Ne
 We organized this dataset as UMAX.csv (time-series) and UMAY.csv (labels). 
 UMAX.csv contains 69 (samples) x 1042 (time steps) x 4 (feature) 
 
+Second dataset is UCI-1. The UCI-1 data set was derived from a system designed to test gas sensors in realistic environments. You can find full dataset in: http://archive.ics.uci.edu/ml/datasets/Gas+sensor+array+exposed+to+turbulent+gas+mixtures
+
+Two classes were created from the mixtures in the data set: first, mixtures of ethylene and methane (Et + Me), and second, mixtures of ethylene and carbon monoxide (Et + CO). 
+
+We organized this dataset as UC1X.csv (time-series) and UC1Y.csv (labels). 
+UC1.csv contains 180 (samples) x 2970 (time steps) x 8 (feature) 
+
